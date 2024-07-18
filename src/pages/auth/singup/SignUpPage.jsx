@@ -12,11 +12,34 @@ import {
     Container,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { GoogleLogin } from "@react-oauth/google";
+import { useAction } from "../../../hooks/useAction";
+
+
 
 const SignUpPage = () => {
+
+
+    const { signUp } = useAction();
+    const navigate = useNavigate();
+
+
+    const googleSuccesHandler = (credentials) => {
+        const token = credentials.credential;
+        
+        signUp(token);
+
+        localStorage.setItem("auth", token);
+        navigate("/");
+    };
+
+    const gooleErrorHandler = () => {
+        console.log("Google auth error");
+    };
+
     const validationSchema = Yup.object({
         email: Yup.string()
             .required("Пошта обов'я зкова")
@@ -47,8 +70,10 @@ const SignUpPage = () => {
         isValid: false
     });
 
+
+
     return (
-        <Container component="main" maxWidth="xs" sx={{mb: 4}}>
+        <Container component="main" maxWidth="xs" sx={{ mb: 4 }}>
             <CssBaseline />
             <Box
                 sx={{
@@ -85,7 +110,7 @@ const SignUpPage = () => {
                                 onBlur={formik.handleBlur}
                             />
                             {formik.touched.firstName &&
-                            formik.errors.firstName ? (
+                                formik.errors.firstName ? (
                                 <div style={{ color: "red" }}>
                                     {formik.errors.firstName}
                                 </div>
@@ -104,7 +129,7 @@ const SignUpPage = () => {
                                 onBlur={formik.handleBlur}
                             />
                             {formik.touched.lastName &&
-                            formik.errors.lastName ? (
+                                formik.errors.lastName ? (
                                 <div style={{ color: "red" }}>
                                     {formik.errors.lastName}
                                 </div>
@@ -142,23 +167,13 @@ const SignUpPage = () => {
                                 onBlur={formik.handleBlur}
                             />
                             {formik.touched.password &&
-                            formik.errors.password ? (
+                                formik.errors.password ? (
                                 <div style={{ color: "red" }}>
                                     {formik.errors.password}
                                 </div>
                             ) : null}
                         </Grid>
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        value="allowExtraEmails"
-                                        color="primary"
-                                    />
-                                }
-                                label="I want to receive inspiration, marketing promotions and updates via email."
-                            />
-                        </Grid>
+
                     </Grid>
                     <Button
                         type="submit"
@@ -170,6 +185,14 @@ const SignUpPage = () => {
                         Sign Up
                     </Button>
                     <Grid container justifyContent="flex-end">
+                        <Box sx={{ mb: 2 }}>
+                            <GoogleLogin
+                                size="large"
+                                width="400px"
+                                onSuccess={googleSuccesHandler}
+                                onError={gooleErrorHandler}
+                            />
+                        </Box>
                         <Grid item>
                             <Link to="/signin">
                                 Already have an account? Sign in

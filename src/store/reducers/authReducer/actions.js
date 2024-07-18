@@ -9,6 +9,15 @@ export const signIn = (token) => (dispatch) => {
     }
 };
 
+export const signUp = (token) => (dispatch) => {
+    try {
+        const user = jwtDecode(token);
+        dispatch({ type: "SIGN_UP", payload: user });
+    } catch (error) {
+        console.error("sign up error: ", error);
+    }
+};
+
 export const logout = () => (dispatch) => {
     localStorage.removeItem("auth");
     dispatch({ type: "LOGOUT" });
